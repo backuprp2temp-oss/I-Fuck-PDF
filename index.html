@@ -37,6 +37,7 @@
   <script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.12.0/dist/pptxgen.bundle.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Inter', system-ui, sans-serif; }
@@ -84,6 +85,11 @@
     .position-btn { width: 36px; height: 36px; border-radius: 8px; border: 1.5px solid #e2e8f0; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease; font-size: 12px; color: #94a3b8; }
     .position-btn:hover, .position-btn.active { border-color: #0EA5E9; background: #f0f9ff; color: #0EA5E9; }
     .position-grid { display: grid; grid-template-columns: repeat(3, 36px); gap: 4px; }
+    /* Modal */
+    .coming-modal { display: none; }
+    .coming-modal.active { display: flex; }
+    .coming-modal-inner { animation: modalIn 0.25s ease; }
+    @keyframes modalIn { from { opacity: 0; transform: scale(0.92) translateY(16px); } to { opacity: 1; transform: scale(1) translateY(0); } }
   </style>
 </head>
 <body class="bg-white text-slate-900 antialiased">
@@ -198,10 +204,10 @@
             <div><h3 class="text-xl sm:text-2xl font-bold">Security</h3><p class="text-sm text-slate-400">Keep your documents safe and compliant</p></div>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
-            <div class="tool-card card-shadow bg-white rounded-xl px-3 py-4 sm:px-4 sm:py-5 flex flex-col items-center text-center gap-2 border border-slate-100/80"><div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i data-lucide="lock" style="width:18px;height:18px;"></i></div><span class="text-xs sm:text-sm font-medium text-slate-700">Protect PDF</span></div>
-            <div class="tool-card card-shadow bg-white rounded-xl px-3 py-4 sm:px-4 sm:py-5 flex flex-col items-center text-center gap-2 border border-slate-100/80"><div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i data-lucide="unlock" style="width:18px;height:18px;"></i></div><span class="text-xs sm:text-sm font-medium text-slate-700">Unlock PDF</span></div>
-            <div class="tool-card card-shadow bg-white rounded-xl px-3 py-4 sm:px-4 sm:py-5 flex flex-col items-center text-center gap-2 border border-slate-100/80"><div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i data-lucide="pen-tool" style="width:18px;height:18px;"></i></div><span class="text-xs sm:text-sm font-medium text-slate-700">Sign PDF</span></div>
-            <div class="tool-card card-shadow bg-white rounded-xl px-3 py-4 sm:px-4 sm:py-5 flex flex-col items-center text-center gap-2 border border-slate-100/80"><div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i data-lucide="wrench" style="width:18px;height:18px;"></i></div><span class="text-xs sm:text-sm font-medium text-slate-700">Repair PDF</span></div>
+            <div class="tool-card card-shadow bg-white rounded-xl px-3 py-4 sm:px-4 sm:py-5 flex flex-col items-center text-center gap-2 border border-slate-100/80" data-tool="protect-pdf"><div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i data-lucide="lock" style="width:18px;height:18px;"></i></div><span class="text-xs sm:text-sm font-medium text-slate-700">Protect PDF</span></div>
+            <div class="tool-card card-shadow bg-white rounded-xl px-3 py-4 sm:px-4 sm:py-5 flex flex-col items-center text-center gap-2 border border-slate-100/80" data-tool="unlock-pdf"><div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i data-lucide="unlock" style="width:18px;height:18px;"></i></div><span class="text-xs sm:text-sm font-medium text-slate-700">Unlock PDF</span></div>
+            <div class="tool-card card-shadow bg-white rounded-xl px-3 py-4 sm:px-4 sm:py-5 flex flex-col items-center text-center gap-2 border border-slate-100/80" data-tool="sign-pdf"><div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i data-lucide="pen-tool" style="width:18px;height:18px;"></i></div><span class="text-xs sm:text-sm font-medium text-slate-700">Sign PDF</span></div>
+            <div class="tool-card card-shadow bg-white rounded-xl px-3 py-4 sm:px-4 sm:py-5 flex flex-col items-center text-center gap-2 border border-slate-100/80" data-tool="repair-pdf"><div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i data-lucide="wrench" style="width:18px;height:18px;"></i></div><span class="text-xs sm:text-sm font-medium text-slate-700">Repair PDF</span></div>
           </div>
         </div>
 
@@ -212,11 +218,11 @@
             <div><h3 class="text-xl sm:text-2xl font-bold">AI Workflows</h3><p class="text-sm text-slate-400">Intelligent document processing</p></div>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
-            <div class="tool-card card-shadow bg-white rounded-xl px-3 py-4 sm:px-4 sm:py-5 flex flex-col items-center text-center gap-2 border border-slate-100/80"><div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="scan" style="width:18px;height:18px;"></i></div><span class="text-xs sm:text-sm font-medium text-slate-700">OCR PDF</span></div>
-            <div class="tool-card card-shadow bg-white rounded-xl px-3 py-4 sm:px-4 sm:py-5 flex flex-col items-center text-center gap-2 border border-slate-100/80"><div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="message-square" style="width:18px;height:18px;"></i></div><span class="text-xs sm:text-sm font-medium text-slate-700">Chat with PDF</span></div>
-            <div class="tool-card card-shadow bg-white rounded-xl px-3 py-4 sm:px-4 sm:py-5 flex flex-col items-center text-center gap-2 border border-slate-100/80"><div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="align-left" style="width:18px;height:18px;"></i></div><span class="text-xs sm:text-sm font-medium text-slate-700">Summarize PDF</span></div>
-            <div class="tool-card card-shadow bg-white rounded-xl px-3 py-4 sm:px-4 sm:py-5 flex flex-col items-center text-center gap-2 border border-slate-100/80"><div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="table" style="width:18px;height:18px;"></i></div><span class="text-xs sm:text-sm font-medium text-slate-700">Extract Tables</span></div>
-            <div class="tool-card card-shadow bg-white rounded-xl px-3 py-4 sm:px-4 sm:py-5 flex flex-col items-center text-center gap-2 border border-slate-100/80"><div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="file-search" style="width:18px;height:18px;"></i></div><span class="text-xs sm:text-sm font-medium text-slate-700">Resume Parser</span></div>
+            <div class="tool-card card-shadow bg-white rounded-xl px-3 py-4 sm:px-4 sm:py-5 flex flex-col items-center text-center gap-2 border border-slate-100/80" data-tool="ocr-pdf"><div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="scan" style="width:18px;height:18px;"></i></div><span class="text-xs sm:text-sm font-medium text-slate-700">OCR PDF</span></div>
+            <div class="tool-card card-shadow bg-white rounded-xl px-3 py-4 sm:px-4 sm:py-5 flex flex-col items-center text-center gap-2 border border-slate-100/80" data-coming-soon data-msg="We are currently training completely local, in-browser AI models using WebNN and WebGPU to power intelligent conversations with your PDF documents."><div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="message-square" style="width:18px;height:18px;"></i></div><span class="text-xs sm:text-sm font-medium text-slate-700">Chat with PDF</span></div>
+            <div class="tool-card card-shadow bg-white rounded-xl px-3 py-4 sm:px-4 sm:py-5 flex flex-col items-center text-center gap-2 border border-slate-100/80" data-coming-soon data-msg="We are currently training completely local, in-browser AI models using WebNN and WebGPU to generate smart summaries of your PDF documents."><div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="align-left" style="width:18px;height:18px;"></i></div><span class="text-xs sm:text-sm font-medium text-slate-700">Summarize PDF</span></div>
+            <div class="tool-card card-shadow bg-white rounded-xl px-3 py-4 sm:px-4 sm:py-5 flex flex-col items-center text-center gap-2 border border-slate-100/80" data-coming-soon data-msg="We are currently training completely local, in-browser AI models using WebNN and WebGPU to accurately extract tables from your documents."><div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="table" style="width:18px;height:18px;"></i></div><span class="text-xs sm:text-sm font-medium text-slate-700">Extract Tables</span></div>
+            <div class="tool-card card-shadow bg-white rounded-xl px-3 py-4 sm:px-4 sm:py-5 flex flex-col items-center text-center gap-2 border border-slate-100/80" data-coming-soon data-msg="We are currently training completely local, in-browser AI models using WebNN and WebGPU to power Resume Parser."><div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="file-search" style="width:18px;height:18px;"></i></div><span class="text-xs sm:text-sm font-medium text-slate-700">Resume Parser</span></div>
           </div>
         </div>
 
@@ -337,6 +343,594 @@
       if (bytes < 1024) return bytes + ' B';
       if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
       return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+
+    // ---- STANDARD PDF ENCRYPTION HELPERS ----
+    const { PDFName, PDFHexString, PDFString, PDFDict, PDFArray, PDFRawStream, PDFNumber } = PDFLib;
+
+    function md5(data) {
+      var bytes = typeof data === 'string' ? new TextEncoder().encode(data) : data;
+      var S = [
+        7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
+        5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,
+        4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
+        6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21
+      ];
+      var K = new Uint32Array([
+        0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
+        0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
+        0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be,
+        0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821,
+        0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa,
+        0xd62f105d, 0x02441453, 0xd8a1e681, 0xe7d3fbc8,
+        0x21e1cde6, 0xc33707d6, 0xf4d50d87, 0x455a14ed,
+        0xa9e3e905, 0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a,
+        0xfffa3942, 0x8771f681, 0x6d9d6122, 0xfde5380c,
+        0xa4beea44, 0x4bdecfa9, 0xf6bb4b60, 0xbebfbc70,
+        0x289b7ec6, 0xeaa127fa, 0xd4ef3085, 0x04881d05,
+        0xd9d4d039, 0xe6db99e5, 0x1fa27cf8, 0xc4ac5665,
+        0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039,
+        0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1,
+        0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1,
+        0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391
+      ]);
+      var a0 = 0x67452301;
+      var b0 = 0xefcdab89;
+      var c0 = 0x98badcfe;
+      var d0 = 0x10325476;
+      var msgLen = bytes.length;
+      var msgBitLen = msgLen * 8;
+      var msgLenPadded = ((msgLen + 9 + 63) & ~63);
+      var msg = new Uint8Array(msgLenPadded);
+      msg.set(bytes);
+      msg[msgLen] = 0x80;
+      var dataView = new DataView(msg.buffer);
+      dataView.setUint32(msgLenPadded - 8, msgBitLen, true);
+      dataView.setUint32(msgLenPadded - 4, 0, true);
+      for (var offset = 0; offset < msgLenPadded; offset += 64) {
+        var chunk = new Uint32Array(msg.buffer, offset, 16);
+        var a = a0, b = b0, c = c0, d = d0;
+        for (var i = 0; i < 64; i++) {
+          var f, g;
+          if (i < 16) {
+            f = (b & c) | ((~b) & d);
+            g = i;
+          } else if (i < 32) {
+            f = (d & b) | ((~d) & c);
+            g = (5 * i + 1) % 16;
+          } else if (i < 48) {
+            f = b ^ c ^ d;
+            g = (3 * i + 5) % 16;
+          } else {
+            f = c ^ (b | (~d));
+            g = (7 * i) % 16;
+          }
+          f = (f + a + K[i] + chunk[g]) >>> 0;
+          a = d;
+          d = c;
+          c = b;
+          b = (b + ((f << S[i]) | (f >>> (32 - S[i])))) >>> 0;
+        }
+        a0 = (a0 + a) >>> 0;
+        b0 = (b0 + b) >>> 0;
+        c0 = (c0 + c) >>> 0;
+        d0 = (d0 + d) >>> 0;
+      }
+      var result = new Uint8Array(16);
+      var view = new DataView(result.buffer);
+      view.setUint32(0, a0, true);
+      view.setUint32(4, b0, true);
+      view.setUint32(8, c0, true);
+      view.setUint32(12, d0, true);
+      return result;
+    }
+
+    var RC4 = function (key) {
+      this.s = new Uint8Array(256);
+      this.i = 0;
+      this.j = 0;
+      for (var i = 0; i < 256; i++) {
+        this.s[i] = i;
+      }
+      var j = 0;
+      for (var i = 0; i < 256; i++) {
+        j = (j + this.s[i] + key[i % key.length]) & 0xFF;
+        var temp = this.s[i];
+        this.s[i] = this.s[j];
+        this.s[j] = temp;
+      }
+    };
+    RC4.prototype.process = function (data) {
+      var result = new Uint8Array(data.length);
+      for (var k = 0; k < data.length; k++) {
+        this.i = (this.i + 1) & 0xFF;
+        this.j = (this.j + this.s[this.i]) & 0xFF;
+        var temp = this.s[this.i];
+        this.s[this.i] = this.s[this.j];
+        this.s[this.j] = temp;
+        var t = (this.s[this.i] + this.s[this.j]) & 0xFF;
+        result[k] = data[k] ^ this.s[t];
+      }
+      return result;
+    };
+
+    function hexToBytes(hex) {
+      var bytes = new Uint8Array(hex.length / 2);
+      for (var i = 0; i < bytes.length; i++) {
+        bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
+      }
+      return bytes;
+    }
+
+    function bytesToHex(bytes) {
+      return Array.from(bytes)
+        .map(function (b) { return b.toString(16).padStart(2, '0'); })
+        .join('');
+    }
+
+    var PADDING = new Uint8Array([
+      0x28, 0xBF, 0x4E, 0x5E, 0x4E, 0x75, 0x8A, 0x41,
+      0x64, 0x00, 0x4E, 0x56, 0xFF, 0xFA, 0x01, 0x08,
+      0x2E, 0x2E, 0x00, 0xB6, 0xD0, 0x68, 0x3E, 0x80,
+      0x2F, 0x0C, 0xA9, 0xFE, 0x64, 0x53, 0x69, 0x7A
+    ]);
+
+    function padPassword(password) {
+      var pwdBytes = new TextEncoder().encode(password);
+      var padded = new Uint8Array(32);
+      if (pwdBytes.length >= 32) {
+        padded.set(pwdBytes.slice(0, 32));
+      } else {
+        padded.set(pwdBytes);
+        padded.set(PADDING.slice(0, 32 - pwdBytes.length), pwdBytes.length);
+      }
+      return padded;
+    }
+
+    function computeEncryptionKey(userPassword, ownerKey, permissions, fileId) {
+      var paddedPwd = padPassword(userPassword);
+      var hashInput = new Uint8Array(paddedPwd.length + ownerKey.length + 4 + fileId.length);
+      var offset = 0;
+      hashInput.set(paddedPwd, offset); offset += paddedPwd.length;
+      hashInput.set(ownerKey, offset); offset += ownerKey.length;
+      hashInput[offset++] = permissions & 0xFF;
+      hashInput[offset++] = (permissions >> 8) & 0xFF;
+      hashInput[offset++] = (permissions >> 16) & 0xFF;
+      hashInput[offset++] = (permissions >> 24) & 0xFF;
+      hashInput.set(fileId, offset);
+      var hash = md5(hashInput);
+      for (var i = 0; i < 50; i++) {
+        hash = md5(hash.slice(0, 16));
+      }
+      return hash.slice(0, 16);
+    }
+
+    function computeOwnerKey(ownerPassword, userPassword) {
+      var paddedOwner = padPassword(ownerPassword || userPassword);
+      var hash = md5(paddedOwner);
+      for (var i = 0; i < 50; i++) {
+        hash = md5(hash);
+      }
+      var paddedUser = padPassword(userPassword);
+      var result = new Uint8Array(paddedUser);
+      for (var i = 0; i < 20; i++) {
+        var key = new Uint8Array(hash.length);
+        for (var j = 0; j < hash.length; j++) {
+          key[j] = hash[j] ^ i;
+        }
+        var rc4 = new RC4(key.slice(0, 16));
+        result = rc4.process(result);
+      }
+      return result;
+    }
+
+    function computeUserKey(encryptionKey, fileId) {
+      var hashInput = new Uint8Array(PADDING.length + fileId.length);
+      hashInput.set(PADDING);
+      hashInput.set(fileId, PADDING.length);
+      var hash = md5(hashInput);
+      var rc4 = new RC4(encryptionKey);
+      var result = rc4.process(hash);
+      for (var i = 1; i <= 19; i++) {
+        var key = new Uint8Array(encryptionKey.length);
+        for (var j = 0; j < encryptionKey.length; j++) {
+          key[j] = encryptionKey[j] ^ i;
+        }
+        var rc4iter = new RC4(key);
+        result = rc4iter.process(result);
+      }
+      var finalResult = new Uint8Array(32);
+      finalResult.set(result);
+      return finalResult;
+    }
+
+    function encryptObject(data, objectNum, generationNum, encryptionKey) {
+      var keyInput = new Uint8Array(encryptionKey.length + 5);
+      keyInput.set(encryptionKey);
+      keyInput[encryptionKey.length] = objectNum & 0xFF;
+      keyInput[encryptionKey.length + 1] = (objectNum >> 8) & 0xFF;
+      keyInput[encryptionKey.length + 2] = (objectNum >> 16) & 0xFF;
+      keyInput[encryptionKey.length + 3] = generationNum & 0xFF;
+      keyInput[encryptionKey.length + 4] = (generationNum >> 8) & 0xFF;
+      var objectKey = md5(keyInput);
+      var rc4 = new RC4(objectKey.slice(0, Math.min(encryptionKey.length + 5, 16)));
+      return rc4.process(data);
+    }
+
+    function encryptStringsInObject(obj, objectNum, generationNum, encryptionKey, visited) {
+      if (!visited) visited = new Set();
+      if (!obj || visited.has(obj)) return;
+      visited.add(obj);
+
+      if (obj instanceof PDFString) {
+        var originalBytes = obj.asBytes();
+        var encrypted = encryptObject(originalBytes, objectNum, generationNum, encryptionKey);
+        obj.value = Array.from(encrypted).map(function (b) { return String.fromCharCode(b); }).join('');
+      } else if (obj instanceof PDFHexString) {
+        var originalBytes = obj.asBytes();
+        var encrypted = encryptObject(originalBytes, objectNum, generationNum, encryptionKey);
+        obj.value = bytesToHex(encrypted);
+      } else if (obj instanceof PDFDict) {
+        var entries = obj.entries();
+        for (var idx = 0; idx < entries.length; idx++) {
+          var key = entries[idx][0];
+          var value = entries[idx][1];
+          var keyName = key.asString();
+          if (keyName !== '/Length' && keyName !== '/Filter' && keyName !== '/DecodeParms') {
+            encryptStringsInObject(value, objectNum, generationNum, encryptionKey, visited);
+          }
+        }
+      } else if (obj instanceof PDFArray) {
+        var array = obj.asArray();
+        for (var idx = 0; idx < array.length; idx++) {
+          encryptStringsInObject(array[idx], objectNum, generationNum, encryptionKey, visited);
+        }
+      }
+    }
+
+    async function encryptPDF(pdfBytes, userPassword, ownerPassword) {
+      if (ownerPassword === undefined) ownerPassword = null;
+
+      // 1. Unpack all object streams first by loading and saving without object streams
+      var tempDoc = await PDFDocument.load(pdfBytes);
+      var unpackedBytes = await tempDoc.save({ useObjectStreams: false });
+
+      // 2. Load the unpacked PDF for encryption
+      var pdfDoc = await PDFDocument.load(unpackedBytes, {
+        ignoreEncryption: true,
+        updateMetadata: false
+      });
+      var context = pdfDoc.context;
+      var fileId;
+      var trailer = context.trailerInfo;
+      var idArray = trailer.ID;
+      if (idArray) {
+        var firstId;
+        if (idArray instanceof PDFArray) {
+          firstId = idArray.get(0);
+        } else if (Array.isArray(idArray)) {
+          firstId = idArray[0];
+        }
+        if (firstId && typeof firstId.asBytes === 'function') {
+          fileId = firstId.asBytes();
+        }
+      }
+      if (!fileId) {
+        var randomBytes = new Uint8Array(16);
+        for (var i = 0; i < 16; i++) {
+          randomBytes[i] = Math.floor(Math.random() * 256);
+        }
+        fileId = randomBytes;
+        var idHex1 = PDFHexString.of(bytesToHex(fileId));
+        var idHex2 = PDFHexString.of(bytesToHex(fileId));
+        trailer.ID = [idHex1, idHex2];
+      }
+      var permissions = 0xFFFFFFFC;
+      var ownerKey = computeOwnerKey(ownerPassword, userPassword);
+      var encryptionKey = computeEncryptionKey(userPassword, ownerKey, permissions, fileId);
+      var userKey = computeUserKey(encryptionKey, fileId);
+      var indirectObjects = context.enumerateIndirectObjects();
+      
+      var visited = new Set();
+      for (var idx = 0; idx < indirectObjects.length; idx++) {
+        var ref = indirectObjects[idx][0];
+        var obj = indirectObjects[idx][1];
+        var objectNum = ref.objectNumber;
+        var generationNum = ref.generationNumber || 0;
+        if (obj instanceof PDFDict) {
+          var filter = obj.get(PDFName.of('Filter'));
+          if (filter && filter.asString() === '/Standard') {
+            continue;
+          }
+        }
+        if (obj instanceof PDFRawStream && obj.dict) {
+          var type = obj.dict.get(PDFName.of('Type'));
+          if (type) {
+            var typeName = type.toString();
+            if (typeName === '/XRef' || typeName === '/Sig') {
+              continue;
+            }
+          }
+        }
+        if (obj instanceof PDFRawStream) {
+          var streamData = obj.contents;
+          var encrypted = encryptObject(streamData, objectNum, generationNum, encryptionKey);
+          obj.contents = encrypted;
+          if (obj.dict) {
+            encryptStringsInObject(obj.dict, objectNum, generationNum, encryptionKey, visited);
+          }
+        }
+        if (!(obj instanceof PDFRawStream)) {
+          encryptStringsInObject(obj, objectNum, generationNum, encryptionKey, visited);
+        }
+      }
+      var encryptDict = context.obj({
+        Filter: PDFName.of('Standard'),
+        V: PDFNumber.of(2),
+        R: PDFNumber.of(3),
+        Length: PDFNumber.of(128),
+        P: PDFNumber.of(permissions),
+        O: PDFHexString.of(bytesToHex(ownerKey)),
+        U: PDFHexString.of(bytesToHex(userKey))
+      });
+      var encryptRef = context.register(encryptDict);
+      trailer.Encrypt = encryptRef;
+      var encryptedBytes = await pdfDoc.save({
+        useObjectStreams: false
+      });
+      return encryptedBytes;
+    }
+
+    async function decryptPDF(pdfBytes, password) {
+      // Helper: yield to event loop to prevent browser freezing on large files
+      function yieldToEventLoop() {
+        return new Promise(function (resolve) { setTimeout(resolve, 0); });
+      }
+
+      // 1. Monkey-patch to skip parsing object streams initially and capture rawStream
+      var originalParseIntoContext = PDFLib.PDFObjectStreamParser.prototype.parseIntoContext;
+      var originalForStream = PDFLib.PDFObjectStreamParser.forStream;
+      
+      var objStmParsers = [];
+      PDFLib.PDFObjectStreamParser.prototype.parseIntoContext = async function () {
+        objStmParsers.push(this);
+      };
+      PDFLib.PDFObjectStreamParser.forStream = function (rawStream, shouldWaitForTick) {
+        var parser = originalForStream(rawStream, shouldWaitForTick);
+        parser.rawStream = rawStream;
+        return parser;
+      };
+
+      var pdfDoc;
+      try {
+        pdfDoc = await PDFDocument.load(pdfBytes, {
+          ignoreEncryption: true,
+          updateMetadata: false
+        });
+      } finally {
+        // 2. Restore original methods immediately
+        PDFLib.PDFObjectStreamParser.prototype.parseIntoContext = originalParseIntoContext;
+        PDFLib.PDFObjectStreamParser.forStream = originalForStream;
+      }
+
+      var context = pdfDoc.context;
+      var trailer = context.trailerInfo;
+      if (!trailer.Encrypt) {
+        throw new Error('This PDF is not encrypted.');
+      }
+      var encryptDictObj = context.lookup(trailer.Encrypt);
+      if (!(encryptDictObj instanceof PDFDict)) {
+        throw new Error('Invalid Encrypt dictionary.');
+      }
+      var filter = encryptDictObj.get(PDFName.of('Filter'));
+      if (!filter || filter.toString() !== '/Standard') {
+        throw new Error('Unsupported encryption filter: ' + (filter ? filter.toString() : 'none'));
+      }
+      var v = encryptDictObj.get(PDFName.of('V'));
+      var r = encryptDictObj.get(PDFName.of('R'));
+      if (!v || !r || v.asNumber() !== 2 || r.asNumber() !== 3) {
+        throw new Error('Unsupported encryption version/revision (V=' + (v ? v.asNumber() : 'none') + ', R=' + (r ? r.asNumber() : 'none') + '). Only Standard 128-bit RC4 is supported.');
+      }
+      var O_hex = encryptDictObj.get(PDFName.of('O'));
+      var U_hex = encryptDictObj.get(PDFName.of('U'));
+      var P_num = encryptDictObj.get(PDFName.of('P'));
+      if (!O_hex || !U_hex || !P_num) {
+        throw new Error('Missing standard encryption parameters.');
+      }
+      var ownerKey = O_hex.asBytes();
+      var docUserKey = U_hex.asBytes();
+      var permissions = P_num.asNumber();
+      var fileId;
+      var idArray = trailer.ID;
+      if (idArray) {
+        var firstId;
+        if (idArray instanceof PDFArray) {
+          firstId = idArray.get(0);
+        } else if (Array.isArray(idArray)) {
+          firstId = idArray[0];
+        }
+        if (firstId && typeof firstId.asBytes === 'function') {
+          fileId = firstId.asBytes();
+        }
+      }
+      if (!fileId) {
+        throw new Error('Document ID missing, required for decryption.');
+      }
+      var encryptionKey = computeEncryptionKey(password, ownerKey, permissions, fileId);
+      var computedUserKey = computeUserKey(encryptionKey, fileId);
+      var isCorrectPassword = true;
+      for (var i = 0; i < 16; i++) {
+        if (computedUserKey[i] !== docUserKey[i]) {
+          isCorrectPassword = false;
+          break;
+        }
+      }
+      if (!isCorrectPassword) {
+        var paddedOwner = padPassword(password);
+        var hash = md5(paddedOwner);
+        for (var i = 0; i < 50; i++) {
+          hash = md5(hash);
+        }
+        var userPwdBytes = new Uint8Array(ownerKey);
+        for (var i = 19; i >= 0; i--) {
+          var key = new Uint8Array(hash.length);
+          for (var j = 0; j < hash.length; j++) {
+            key[j] = hash[j] ^ i;
+          }
+          var rc4 = new RC4(key.slice(0, 16));
+          userPwdBytes = rc4.process(userPwdBytes);
+        }
+        var paddedPwd = userPwdBytes.slice(0, 32);
+        var hashInput = new Uint8Array(paddedPwd.length + ownerKey.length + 4 + fileId.length);
+        var offset = 0;
+        hashInput.set(paddedPwd, offset); offset += paddedPwd.length;
+        hashInput.set(ownerKey, offset); offset += ownerKey.length;
+        hashInput[offset++] = permissions & 0xFF;
+        hashInput[offset++] = (permissions >> 8) & 0xFF;
+        hashInput[offset++] = (permissions >> 16) & 0xFF;
+        hashInput[offset++] = (permissions >> 24) & 0xFF;
+        hashInput.set(fileId, offset);
+        var hashDer = md5(hashInput);
+        for (var i = 0; i < 50; i++) {
+          hashDer = md5(hashDer.slice(0, 16));
+        }
+        encryptionKey = hashDer.slice(0, 16);
+        computedUserKey = computeUserKey(encryptionKey, fileId);
+        isCorrectPassword = true;
+        for (var i = 0; i < 16; i++) {
+          if (computedUserKey[i] !== docUserKey[i]) {
+            isCorrectPassword = false;
+            break;
+          }
+        }
+      }
+      if (!isCorrectPassword) {
+        throw new Error('Incorrect password. Cannot decrypt this PDF.');
+      }
+
+      // 3. Build a reverse lookup map (object → ref) for efficient ObjStm ref resolution
+      var objToRefMap = new Map();
+      var allEntries = context.enumerateIndirectObjects();
+      for (var k = 0; k < allEntries.length; k++) {
+        objToRefMap.set(allEntries[k][1], allEntries[k][0]);
+      }
+
+      // 4. Decrypt raw `/ObjStm` streams first and track their refs
+      var objStmRefSet = new Set();
+      for (var idx = 0; idx < objStmParsers.length; idx++) {
+        var parser = objStmParsers[idx];
+        var rawStream = parser.rawStream;
+        var objRef = objToRefMap.get(rawStream) || null;
+        if (!objRef) {
+          objRef = context.getObjectRef(rawStream);
+        }
+        if (objRef) {
+          objStmRefSet.add(objRef.objectNumber + '-' + (objRef.generationNumber || 0));
+          var objectNum = objRef.objectNumber;
+          var generationNum = objRef.generationNumber || 0;
+          var decrypted = encryptObject(rawStream.contents, objectNum, generationNum, encryptionKey);
+          rawStream.contents = decrypted;
+          if (rawStream.dict) {
+            encryptStringsInObject(rawStream.dict, objectNum, generationNum, encryptionKey);
+          }
+        }
+      }
+
+      // 5. Parse decrypted Object Streams into context
+      // Collect object refs that existed BEFORE parsing ObjStm so we know which are new
+      var preParseRefs = new Set();
+      var preParseObjects = context.enumerateIndirectObjects();
+      for (var k = 0; k < preParseObjects.length; k++) {
+        var ref = preParseObjects[k][0];
+        preParseRefs.add(ref.objectNumber + '-' + (ref.generationNumber || 0));
+      }
+
+      for (var idx = 0; idx < objStmParsers.length; idx++) {
+        var parser = objStmParsers[idx];
+        var ByteStream = parser.bytes.constructor;
+        var decoded = PDFLib.decodePDFRawStream(parser.rawStream).decode();
+        parser.bytes = new ByteStream(decoded);
+        parser.alreadyParsed = false;
+        await parser.parseIntoContext();
+      }
+
+      // 6. Decrypt all other indirect objects
+      // Objects that came from inside ObjStm (newly parsed) have their strings NOT
+      // individually encrypted — they were protected by the ObjStm stream encryption.
+      // Only objects that existed before ObjStm parsing need string decryption.
+      var indirectObjects = context.enumerateIndirectObjects();
+      var visited = new Set();
+      var encryptRef = trailer.Encrypt;
+      var encryptRefKey = encryptRef && encryptRef.objectNumber
+        ? encryptRef.objectNumber + '-' + (encryptRef.generationNumber || 0)
+        : null;
+
+      for (var idx = 0; idx < indirectObjects.length; idx++) {
+        // Yield to event loop every 500 objects to prevent browser freezing
+        if (idx > 0 && idx % 500 === 0) {
+          await yieldToEventLoop();
+        }
+
+        var ref = indirectObjects[idx][0];
+        var obj = indirectObjects[idx][1];
+        var objectNum = ref.objectNumber;
+        var generationNum = ref.generationNumber || 0;
+        var refKey = objectNum + '-' + generationNum;
+
+        // Skip the Encrypt dictionary itself
+        if (refKey === encryptRefKey) {
+          continue;
+        }
+
+        // Skip ObjStm streams (already decrypted in step 4)
+        if (objStmRefSet.has(refKey)) {
+          continue;
+        }
+
+        // Check if this object was parsed from an ObjStm (didn't exist before parsing)
+        var isFromObjStm = !preParseRefs.has(refKey);
+
+        if (obj instanceof PDFDict && !(obj instanceof PDFRawStream)) {
+          var filter = obj.get(PDFName.of('Filter'));
+          if (filter && filter.asString() === '/Standard') {
+            continue;
+          }
+        }
+        if (obj instanceof PDFRawStream && obj.dict) {
+          var type = obj.dict.get(PDFName.of('Type'));
+          if (type) {
+            var typeName = type.toString();
+            if (typeName === '/XRef' || typeName === '/Sig') {
+              continue;
+            }
+          }
+          var filter = obj.dict.get(PDFName.of('Filter'));
+          if (filter && filter.toString() === '/Standard') {
+            continue;
+          }
+        }
+        if (obj instanceof PDFRawStream) {
+          // Stream contents are always individually encrypted (even if from ObjStm,
+          // but objects from ObjStm are typically not PDFRawStream)
+          if (!isFromObjStm) {
+            var streamData = obj.contents;
+            var decrypted = encryptObject(streamData, objectNum, generationNum, encryptionKey);
+            obj.contents = decrypted;
+          }
+          if (obj.dict && !isFromObjStm) {
+            encryptStringsInObject(obj.dict, objectNum, generationNum, encryptionKey, visited);
+          }
+        } else if (!isFromObjStm) {
+          // Only decrypt strings for objects NOT from ObjStm
+          encryptStringsInObject(obj, objectNum, generationNum, encryptionKey, visited);
+        }
+      }
+      
+      delete trailer.Encrypt;
+      
+      // Use pdfDoc.save() for reliable serialization of complex/large PDFs
+      var decryptedBytes = await pdfDoc.save({ useObjectStreams: false });
+      return decryptedBytes;
     }
 
     // ====== TOOL DEFINITIONS ======
@@ -3240,6 +3834,611 @@
       cleanup: function () { this.state.file = null; this.state.image = null; }
     };
 
+    // ---- OCR PDF ----
+    TOOLS['ocr-pdf'] = {
+      name: 'OCR PDF',
+      icon: 'scan',
+      state: { file: null, pages: [] },
+      render: function () {
+        return '<div class="max-w-3xl mx-auto">' +
+          '<div class="mb-8"><h3 class="text-2xl font-bold mb-2">OCR PDF</h3><p class="text-slate-500">Extract text from scanned PDFs using optical character recognition. All processing happens locally in your browser.</p></div>' +
+          '<div id="ocr-dropzone" class="drop-zone p-10 sm:p-14 text-center mb-6">' +
+          '<div class="flex flex-col items-center gap-3"><i data-lucide="upload" style="width:40px;height:40px;" class="text-slate-300"></i>' +
+          '<p class="text-slate-500 font-medium">Drop a PDF here or <span class="text-sky-600 underline">browse</span></p>' +
+          '<p class="text-xs text-slate-400">PDF files only</p></div>' +
+          '<input type="file" id="ocr-input" accept=".pdf,application/pdf" class="hidden" />' +
+          '</div>' +
+          '<div id="ocr-file-info" class="mb-6"></div>' +
+          '<div id="ocr-controls" class="hidden mb-6 p-5 sm:p-6 bg-slate-50 rounded-xl border border-slate-200 space-y-4">' +
+          '<div><label class="text-sm font-medium text-slate-700 mb-1.5 block">Language</label>' +
+          '<select id="ocr-lang" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500 bg-white">' +
+          '<option value="eng">English</option>' +
+          '<option value="fra">French</option>' +
+          '<option value="deu">German</option>' +
+          '<option value="spa">Spanish</option>' +
+          '<option value="ita">Italian</option>' +
+          '<option value="por">Portuguese</option>' +
+          '<option value="nld">Dutch</option>' +
+          '</select></div>' +
+          '</div>' +
+          '<button id="ocr-btn" class="btn-primary text-white font-semibold px-6 py-3 rounded-xl inline-flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed hidden" disabled><i data-lucide="scan" style="width:18px;height:18px;"></i> Run OCR</button>' +
+          '<div id="ocr-progress" class="mt-4 space-y-2"></div>' +
+          '<div id="ocr-result" class="mt-6"></div>' +
+          '</div>';
+      },
+      init: function () {
+        var self = this;
+        var dropzone = document.getElementById('ocr-dropzone');
+        var input = document.getElementById('ocr-input');
+        var info = document.getElementById('ocr-file-info');
+        var controls = document.getElementById('ocr-controls');
+        var btn = document.getElementById('ocr-btn');
+        var progress = document.getElementById('ocr-progress');
+        var result = document.getElementById('ocr-result');
+
+        dropzone.addEventListener('click', function () { input.click(); });
+        input.addEventListener('change', function () { if (this.files[0]) loadFile(this.files[0]); });
+        dropzone.addEventListener('dragover', function (e) { e.preventDefault(); this.classList.add('drag-over'); });
+        dropzone.addEventListener('dragleave', function () { this.classList.remove('drag-over'); });
+        dropzone.addEventListener('drop', function (e) { e.preventDefault(); this.classList.remove('drag-over'); if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+
+        async function loadFile(file) {
+          if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) return;
+          self.state.file = file;
+          self.state.pages = [];
+          info.innerHTML = '<div class="flex items-center gap-3 p-4 bg-sky-50 border border-sky-200 rounded-xl"><div class="w-10 h-10 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center"><i data-lucide="file-text" style="width:20px;height:20px;"></i></div><div><p class="text-sm font-medium text-sky-800">' + file.name + '</p><p class="text-xs text-sky-600">' + formatSize(file.size) + '</p></div></div>';
+          controls.classList.remove('hidden');
+          btn.classList.remove('hidden');
+          btn.disabled = false;
+          result.innerHTML = '';
+          progress.innerHTML = '';
+          lucide.createIcons();
+        }
+
+        btn.addEventListener('click', async function () {
+          if (!self.state.file) return;
+          btn.disabled = true; btn.innerHTML = '<span class="spinner inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span> Running OCR...';
+          result.innerHTML = '';
+          progress.innerHTML = '';
+          self.state.pages = [];
+
+          try {
+            var buf = await self.state.file.arrayBuffer();
+            var pdfjsDoc = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
+            var total = pdfjsDoc.numPages;
+            var lang = document.getElementById('ocr-lang').value;
+            var fullText = '';
+
+            for (var i = 1; i <= total; i++) {
+              var progressItem = document.createElement('div');
+              progressItem.className = 'flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl text-sm';
+              progressItem.innerHTML = '<span class="spinner inline-block w-4 h-4 border-2 border-sky-500 border-t-transparent rounded-full"></span> Page ' + i + ' of ' + total + '...';
+              progress.appendChild(progressItem);
+
+              var page = await pdfjsDoc.getPage(i);
+              var vp = page.getViewport({ scale: 2 });
+              var canvas = document.createElement('canvas');
+              canvas.width = vp.width;
+              canvas.height = vp.height;
+              await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+
+              var { data } = await Tesseract.recognize(canvas, lang, {
+                logger: function (m) {
+                  if (m.status === 'recognizing text') {
+                    progressItem.innerHTML = '<span class="spinner inline-block w-4 h-4 border-2 border-sky-500 border-t-transparent rounded-full"></span> Page ' + i + ' of ' + total + ' (' + Math.round(m.progress * 100) + '%)';
+                  }
+                }
+              });
+
+              progressItem.innerHTML = '<span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center"><i data-lucide="check" style="width:12px;height:12px;"></i></span> Page ' + i + ' of ' + total + ' - Done';
+
+              fullText += '--- Page ' + i + ' ---\n' + data.text + '\n\n';
+              self.state.pages.push({ page: i, text: data.text });
+              lucide.createIcons();
+            }
+
+            pdfjsDoc.destroy();
+
+            var displayText = fullText.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+            result.innerHTML = '<div class="result-card p-5 bg-emerald-50 border border-emerald-200 rounded-xl">' +
+              '<div class="flex items-center justify-between mb-4"><div><p class="font-semibold text-emerald-800">✓ OCR Complete!</p><p class="text-sm text-emerald-600">' + total + ' pages processed</p></div>' +
+              '<button id="ocr-download-btn" class="bg-emerald-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-all flex items-center gap-2"><i data-lucide="download" style="width:16px;height:16px;"></i> Download Text</button></div>' +
+              '<div class="bg-white border border-slate-200 rounded-xl p-4 max-h-80 overflow-y-auto"><pre class="text-xs text-slate-700 whitespace-pre-wrap font-sans">' + displayText + '</pre></div>' +
+              '</div>';
+
+            lucide.createIcons();
+
+            document.getElementById('ocr-download-btn').addEventListener('click', function () {
+              var blob = new Blob([fullText], { type: 'text/plain' });
+              var url = URL.createObjectURL(blob);
+              var a = document.createElement('a');
+              a.href = url;
+              a.download = self.state.file.name.replace('.pdf', '-ocr.txt');
+              a.click();
+              URL.revokeObjectURL(url);
+            });
+
+          } catch (err) {
+            result.innerHTML = '<div class="p-4 bg-red-50 text-red-700 rounded-xl text-sm">Error: ' + err.message + '</div>';
+          }
+
+          btn.disabled = false; btn.innerHTML = '<i data-lucide="scan" style="width:18px;height:18px;"></i> Run OCR'; lucide.createIcons();
+        });
+      },
+      cleanup: function () { this.state.file = null; this.state.pages = []; }
+    };
+
+    // ---- PROTECT PDF ----
+    TOOLS['protect-pdf'] = {
+      name: 'Protect PDF',
+      icon: 'lock',
+      state: { file: null },
+      render: function () {
+        return '<div class="max-w-3xl mx-auto">' +
+          '<div class="mb-8"><h3 class="text-2xl font-bold mb-2">Protect PDF</h3><p class="text-slate-500">Encrypt your PDF with a password. The output is a standard password-protected PDF file — any standard PDF reader (Acrobat, Chrome, Edge, Safari, Preview) will natively prompt for this password when opening the file.</p></div>' +
+          '<div id="protect-dropzone" class="drop-zone p-10 sm:p-14 text-center mb-6">' +
+          '<div class="flex flex-col items-center gap-3"><i data-lucide="upload" style="width:40px;height:40px;" class="text-slate-300"></i>' +
+          '<p class="text-slate-500 font-medium">Drop a PDF here or <span class="text-sky-600 underline">browse</span></p></div>' +
+          '<input type="file" id="protect-input" accept=".pdf,application/pdf" class="hidden" />' +
+          '</div>' +
+          '<div id="protect-file-info" class="mb-6"></div>' +
+          '<div id="protect-controls" class="hidden mb-6 p-5 sm:p-6 bg-slate-50 rounded-xl border border-slate-200 space-y-5">' +
+          '<div><label class="text-sm font-medium text-slate-700 mb-1.5 block">Password</label>' +
+          '<input type="password" id="protect-password" placeholder="Enter a strong password" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500 bg-white" /></div>' +
+          '<div><label class="text-sm font-medium text-slate-700 mb-1.5 block">Confirm password</label>' +
+          '<input type="password" id="protect-confirm" placeholder="Re-enter password" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500 bg-white" /></div>' +
+          '<div class="text-xs text-slate-400"><i data-lucide="info" style="width:14px;height:14px;display:inline;"></i> Standard 128-bit PDF encryption. Password cannot be recovered. Max file size: ~50 MB.</div>' +
+          '</div>' +
+          '<button id="protect-btn" class="btn-primary text-white font-semibold px-6 py-3 rounded-xl inline-flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed hidden" disabled><i data-lucide="lock" style="width:18px;height:18px;"></i> Protect PDF</button>' +
+          '<div id="protect-result" class="mt-6"></div>' +
+          '</div>';
+      },
+      init: function () {
+        var self = this;
+        var dropzone = document.getElementById('protect-dropzone');
+        var input = document.getElementById('protect-input');
+        var info = document.getElementById('protect-file-info');
+        var controls = document.getElementById('protect-controls');
+        var btn = document.getElementById('protect-btn');
+        var result = document.getElementById('protect-result');
+
+        dropzone.addEventListener('click', function () { input.click(); });
+        input.addEventListener('change', function () { if (this.files[0]) loadFile(this.files[0]); });
+        dropzone.addEventListener('dragover', function (e) { e.preventDefault(); this.classList.add('drag-over'); });
+        dropzone.addEventListener('dragleave', function () { this.classList.remove('drag-over'); });
+        dropzone.addEventListener('drop', function (e) { e.preventDefault(); this.classList.remove('drag-over'); if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+
+        function loadFile(file) {
+          if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) return;
+          self.state.file = file;
+          info.innerHTML = '<div class="flex items-center gap-3 p-4 bg-sky-50 border border-sky-200 rounded-xl"><div class="w-10 h-10 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center"><i data-lucide="file-text" style="width:20px;height:20px;"></i></div><div><p class="text-sm font-medium text-sky-800">' + file.name + '</p><p class="text-xs text-sky-600">' + formatSize(file.size) + '</p></div></div>';
+          controls.classList.remove('hidden');
+          btn.classList.remove('hidden');
+          btn.disabled = false;
+          result.innerHTML = '';
+          lucide.createIcons();
+        }
+
+        btn.addEventListener('click', async function () {
+          if (!self.state.file) return;
+          var password = document.getElementById('protect-password').value;
+          var confirm = document.getElementById('protect-confirm').value;
+          if (!password || password.length < 4) { result.innerHTML = '<div class="p-4 bg-amber-50 text-amber-700 rounded-xl text-sm">Password must be at least 4 characters.</div>'; return; }
+          if (password !== confirm) { result.innerHTML = '<div class="p-4 bg-amber-50 text-amber-700 rounded-xl text-sm">Passwords do not match.</div>'; return; }
+
+          btn.disabled = true; btn.innerHTML = '<span class="spinner inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span> Encrypting...';
+          result.innerHTML = '';
+          try {
+            var buf = await self.state.file.arrayBuffer();
+            if (buf.byteLength > 50 * 1024 * 1024) { throw new Error('File too large. Maximum: 50 MB.'); }
+
+            // Validate original PDF
+            try { await PDFDocument.load(buf); } catch (e) { throw new Error('Invalid or corrupted PDF file.'); }
+
+            // Standard native PDF 128-bit RC4 encryption
+            var encryptedBytes = await encryptPDF(new Uint8Array(buf), password);
+            var blob = new Blob([encryptedBytes], { type: 'application/pdf' });
+            var url = URL.createObjectURL(blob);
+            result.innerHTML = '<div class="result-card p-5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">' +
+              '<div><p class="font-semibold text-emerald-800">✓ PDF protected!</p><p class="text-sm text-emerald-600">Standard 128-bit PDF Encryption · ' + formatSize(buf.byteLength) + ' → ' + formatSize(blob.size) + '</p></div>' +
+              '<a href="' + url + '" download="' + self.state.file.name.replace('.pdf', '-protected.pdf') + '" class="bg-emerald-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-all flex items-center gap-2"><i data-lucide="download" style="width:16px;height:16px;"></i> Download</a>' +
+              '</div>';
+            lucide.createIcons();
+          } catch (err) {
+            result.innerHTML = '<div class="p-4 bg-red-50 text-red-700 rounded-xl text-sm">Error: ' + err.message + '</div>';
+          }
+          btn.disabled = false; btn.innerHTML = '<i data-lucide="lock" style="width:18px;height:18px;"></i> Protect PDF'; lucide.createIcons();
+        });
+      },
+      cleanup: function () { this.state.file = null; }
+    };
+
+    // ---- UNLOCK PDF ----
+    TOOLS['unlock-pdf'] = {
+      name: 'Unlock PDF',
+      icon: 'unlock',
+      state: { file: null },
+      render: function () {
+        return '<div class="max-w-3xl mx-auto">' +
+          '<div class="mb-8"><h3 class="text-2xl font-bold mb-2">Unlock PDF</h3><p class="text-slate-500">Remove password protection from PDFs. Supports standard PDF passwords and encrypted files from the Protect PDF tool.</p></div>' +
+          '<div id="unlock-dropzone" class="drop-zone p-10 sm:p-14 text-center mb-6">' +
+          '<div class="flex flex-col items-center gap-3"><i data-lucide="upload" style="width:40px;height:40px;" class="text-slate-300"></i>' +
+          '<p class="text-slate-500 font-medium">Drop a PDF here or <span class="text-sky-600 underline">browse</span></p></div>' +
+          '<input type="file" id="unlock-input" accept=".pdf,application/pdf" class="hidden" />' +
+          '</div>' +
+          '<div id="unlock-file-info" class="mb-6"></div>' +
+          '<div id="unlock-controls" class="hidden mb-6 p-5 sm:p-6 bg-slate-50 rounded-xl border border-slate-200 space-y-4">' +
+          '<div><label class="text-sm font-medium text-slate-700 mb-1.5 block">Password</label>' +
+          '<input type="password" id="unlock-password" placeholder="Enter password to unlock" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500 bg-white" /></div>' +
+          '</div>' +
+          '<button id="unlock-btn" class="btn-primary text-white font-semibold px-6 py-3 rounded-xl inline-flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed hidden" disabled><i data-lucide="unlock" style="width:18px;height:18px;"></i> Unlock PDF</button>' +
+          '<div id="unlock-result" class="mt-6"></div>' +
+          '</div>';
+      },
+      init: function () {
+        var self = this;
+        var dropzone = document.getElementById('unlock-dropzone');
+        var input = document.getElementById('unlock-input');
+        var info = document.getElementById('unlock-file-info');
+        var controls = document.getElementById('unlock-controls');
+        var btn = document.getElementById('unlock-btn');
+        var result = document.getElementById('unlock-result');
+
+        dropzone.addEventListener('click', function () { input.click(); });
+        input.addEventListener('change', function () { if (this.files[0]) loadFile(this.files[0]); });
+        dropzone.addEventListener('dragover', function (e) { e.preventDefault(); this.classList.add('drag-over'); });
+        dropzone.addEventListener('dragleave', function () { this.classList.remove('drag-over'); });
+        dropzone.addEventListener('drop', function (e) { e.preventDefault(); this.classList.remove('drag-over'); if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+
+        function loadFile(file) {
+          if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) return;
+          self.state.file = file;
+          info.innerHTML = '<div class="flex items-center gap-3 p-4 bg-sky-50 border border-sky-200 rounded-xl"><div class="w-10 h-10 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center"><i data-lucide="file-text" style="width:20px;height:20px;"></i></div><div><p class="text-sm font-medium text-sky-800">' + file.name + '</p><p class="text-xs text-sky-600">' + formatSize(file.size) + '</p></div></div>';
+          controls.classList.remove('hidden');
+          btn.classList.remove('hidden');
+          btn.disabled = false;
+          result.innerHTML = '';
+          lucide.createIcons();
+        }
+
+        function base64ToBuf(str) {
+          var binary = atob(str);
+          var len = binary.length;
+          var bytes = new Uint8Array(len);
+          for (var i = 0; i < len; i++) {
+            bytes[i] = binary.charCodeAt(i);
+          }
+          return bytes.buffer;
+        }
+
+        btn.addEventListener('click', async function () {
+          if (!self.state.file) return;
+          var password = document.getElementById('unlock-password').value;
+          btn.disabled = true; btn.innerHTML = '<span class="spinner inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span> Unlocking...';
+          result.innerHTML = '';
+          try {
+            var buf = await self.state.file.arrayBuffer();
+            var pdfBytes = new Uint8Array(buf);
+
+            // Show progress hint for large files (> 5MB)
+            if (buf.byteLength > 5 * 1024 * 1024) {
+              result.innerHTML = '<div class="p-4 bg-sky-50 border border-sky-200 rounded-xl text-sm text-sky-700 flex items-center gap-2"><span class="spinner inline-block w-4 h-4 border-2 border-sky-500 border-t-transparent rounded-full"></span> Processing large file (' + formatSize(buf.byteLength) + ')... This may take a moment.</div>';
+            }
+
+            // 1. Check if the PDF is actually encrypted
+            // Use ignoreEncryption:true so it always loads successfully, even for large encrypted PDFs
+            var isEncrypted = false;
+            try {
+              var checkPdf = await PDFDocument.load(buf, { ignoreEncryption: true, updateMetadata: false });
+              var context = checkPdf.context;
+              if (context.trailerInfo.Encrypt) {
+                isEncrypted = true;
+              }
+            } catch (e) {
+              if (e.message && (e.message.toLowerCase().indexOf('encrypt') >= 0 || e.message.toLowerCase().indexOf('password') >= 0)) {
+                isEncrypted = true;
+              } else {
+                throw e;
+              }
+            }
+
+            var cleanBytes;
+            var wasEncrypted = false;
+
+            if (isEncrypted) {
+              if (!password) { throw new Error('This PDF is password-protected. Please enter the password.'); }
+              // Natively decrypt standard RC4 128-bit PDF
+              cleanBytes = await decryptPDF(pdfBytes, password);
+              wasEncrypted = true;
+            } else {
+              // Not encrypted, just strip metadata and save
+              var pdf = await PDFDocument.load(buf);
+              pdf.setTitle(''); pdf.setAuthor(''); pdf.setSubject('');
+              pdf.setKeywords([]); pdf.setProducer(''); pdf.setCreator('');
+              cleanBytes = await pdf.save({ useObjectStreams: true });
+            }
+
+            var blob = new Blob([cleanBytes], { type: 'application/pdf' });
+            var url = URL.createObjectURL(blob);
+            var msg = wasEncrypted ? 'Password removed · Metadata stripped' : 'Metadata stripped · PDF optimized';
+            result.innerHTML = '<div class="result-card p-5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">' +
+              '<div><p class="font-semibold text-emerald-800">' + (wasEncrypted ? '✓ PDF unlocked!' : '✓ PDF processed!') + '</p><p class="text-sm text-emerald-600">' + msg + ' · ' + formatSize(blob.size) + '</p></div>' +
+              '<a href="' + url + '" download="' + self.state.file.name.replace('-protected.pdf', '').replace('.pdf', '-unlocked.pdf') + '" class="bg-emerald-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-all flex items-center gap-2"><i data-lucide="download" style="width:16px;height:16px;"></i> Download</a>' +
+              '</div>';
+            lucide.createIcons();
+          } catch (err) {
+            result.innerHTML = '<div class="p-4 bg-red-50 text-red-700 rounded-xl text-sm">Error: ' + err.message + '</div>';
+          }
+          btn.disabled = false; btn.innerHTML = '<i data-lucide="unlock" style="width:18px;height:18px;"></i> Unlock PDF'; lucide.createIcons();
+        });
+      },
+      cleanup: function () { this.state.file = null; }
+    };
+
+    // ---- SIGN PDF ----
+    TOOLS['sign-pdf'] = {
+      name: 'Sign PDF',
+      icon: 'pen-tool',
+      state: { file: null },
+      render: function () {
+        return '<div class="max-w-3xl mx-auto">' +
+          '<div class="mb-8"><h3 class="text-2xl font-bold mb-2">Sign PDF</h3><p class="text-slate-500">Add a signature placeholder to your PDF document. Signer details are drawn on the last page.</p></div>' +
+          '<div id="sign-dropzone" class="drop-zone p-10 sm:p-14 text-center mb-6">' +
+          '<div class="flex flex-col items-center gap-3"><i data-lucide="upload" style="width:40px;height:40px;" class="text-slate-300"></i>' +
+          '<p class="text-slate-500 font-medium">Drop a PDF here or <span class="text-sky-600 underline">browse</span></p></div>' +
+          '<input type="file" id="sign-input" accept=".pdf,application/pdf" class="hidden" />' +
+          '</div>' +
+          '<div id="sign-file-info" class="mb-6"></div>' +
+          '<div id="sign-controls" class="hidden mb-6 p-5 sm:p-6 bg-slate-50 rounded-xl border border-slate-200 space-y-5">' +
+          '<div><label class="text-sm font-medium text-slate-700 mb-1.5 block">Signer name</label>' +
+          '<input type="text" id="sign-name" placeholder="e.g. John Doe" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500 bg-white" /></div>' +
+          '<div><label class="text-sm font-medium text-slate-700 mb-1.5 block">Title / Role</label>' +
+          '<input type="text" id="sign-title" placeholder="e.g. CEO, Manager" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500 bg-white" /></div>' +
+          '<div><label class="text-sm font-medium text-slate-700 mb-1.5 block">Date</label>' +
+          '<input type="date" id="sign-date" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500 bg-white" /></div>' +
+          '<div><label class="text-sm font-medium text-slate-700 mb-1.5 block">Reason (optional)</label>' +
+          '<input type="text" id="sign-reason" placeholder="e.g. I approve this document" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500 bg-white" /></div>' +
+          '</div>' +
+          '<button id="sign-btn" class="btn-primary text-white font-semibold px-6 py-3 rounded-xl inline-flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed hidden" disabled><i data-lucide="pen-tool" style="width:18px;height:18px;"></i> Sign PDF</button>' +
+          '<div id="sign-result" class="mt-6"></div>' +
+          '</div>';
+      },
+      init: function () {
+        var self = this;
+        var dropzone = document.getElementById('sign-dropzone');
+        var input = document.getElementById('sign-input');
+        var info = document.getElementById('sign-file-info');
+        var controls = document.getElementById('sign-controls');
+        var btn = document.getElementById('sign-btn');
+        var result = document.getElementById('sign-result');
+
+        // Set default date to today
+        var today = new Date();
+        var dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+
+        dropzone.addEventListener('click', function () { input.click(); });
+        input.addEventListener('change', function () { if (this.files[0]) loadFile(this.files[0]); });
+        dropzone.addEventListener('dragover', function (e) { e.preventDefault(); this.classList.add('drag-over'); });
+        dropzone.addEventListener('dragleave', function () { this.classList.remove('drag-over'); });
+        dropzone.addEventListener('drop', function (e) { e.preventDefault(); this.classList.remove('drag-over'); if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+
+        function loadFile(file) {
+          if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) return;
+          self.state.file = file;
+          info.innerHTML = '<div class="flex items-center gap-3 p-4 bg-sky-50 border border-sky-200 rounded-xl"><div class="w-10 h-10 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center"><i data-lucide="file-text" style="width:20px;height:20px;"></i></div><div><p class="text-sm font-medium text-sky-800">' + file.name + '</p><p class="text-xs text-sky-600">' + formatSize(file.size) + '</p></div></div>';
+          var dateInput = document.getElementById('sign-date');
+          if (dateInput && !dateInput.value) dateInput.value = dateStr;
+          controls.classList.remove('hidden');
+          btn.classList.remove('hidden');
+          btn.disabled = false;
+          result.innerHTML = '';
+          lucide.createIcons();
+        }
+
+        btn.addEventListener('click', async function () {
+          if (!self.state.file) return;
+          var name = document.getElementById('sign-name').value.trim();
+          if (!name) { result.innerHTML = '<div class="p-4 bg-amber-50 text-amber-700 rounded-xl text-sm">Please enter the signer name.</div>'; return; }
+          var title = document.getElementById('sign-title').value.trim();
+          var dateVal = document.getElementById('sign-date').value || dateStr;
+          var reason = document.getElementById('sign-reason').value.trim();
+
+          btn.disabled = true; btn.innerHTML = '<span class="spinner inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span> Signing...';
+          result.innerHTML = '';
+          try {
+            var buf = await self.state.file.arrayBuffer();
+            var pdf = await PDFDocument.load(buf);
+            var font = await pdf.embedFont(StandardFonts.Helvetica);
+            var boldFont = await pdf.embedFont(StandardFonts.HelveticaBold);
+            var pages = pdf.getPages();
+            var page = pages[pages.length - 1];
+            var pw = page.getWidth();
+            var margin = 60;
+            var startY = 140;
+            var lineLen = 200;
+
+            // Signature title
+            page.drawText('Signature', {
+              x: margin, y: startY + 50,
+              font: boldFont, size: 16,
+              color: rgb(0.1, 0.1, 0.1),
+            });
+
+            // Signature line
+            page.drawLine({
+              start: { x: margin, y: startY + 30 },
+              end: { x: margin + lineLen, y: startY + 30 },
+              thickness: 1.5,
+              color: rgb(0.2, 0.2, 0.2),
+            });
+
+            // Signed by label
+            page.drawText('Signed by:', {
+              x: margin, y: startY,
+              font: font, size: 10,
+              color: rgb(0.4, 0.4, 0.4),
+            });
+
+            // Signer name
+            page.drawText(name, {
+              x: margin + 80, y: startY,
+              font: boldFont, size: 11,
+              color: rgb(0.1, 0.1, 0.1),
+            });
+
+            // Title
+            var yPos = startY - 22;
+            if (title) {
+              page.drawText('Title:', {
+                x: margin, y: yPos,
+                font: font, size: 10,
+                color: rgb(0.4, 0.4, 0.4),
+              });
+              page.drawText(title, {
+                x: margin + 45, y: yPos,
+                font: font, size: 11,
+                color: rgb(0.1, 0.1, 0.1),
+              });
+              yPos -= 22;
+            }
+
+            // Date
+            page.drawText('Date:', {
+              x: margin, y: yPos,
+              font: font, size: 10,
+              color: rgb(0.4, 0.4, 0.4),
+            });
+            page.drawText(dateVal, {
+              x: margin + 45, y: yPos,
+              font: font, size: 11,
+              color: rgb(0.1, 0.1, 0.1),
+            });
+            yPos -= 22;
+
+            // Reason
+            if (reason) {
+              page.drawText('Reason:', {
+                x: margin, y: yPos,
+                font: font, size: 10,
+                color: rgb(0.4, 0.4, 0.4),
+              });
+              page.drawText(reason, {
+                x: margin + 65, y: yPos,
+                font: font, size: 11,
+                color: rgb(0.1, 0.1, 0.1),
+              });
+            }
+
+            var bytes = await pdf.save();
+            var blob = new Blob([bytes], { type: 'application/pdf' });
+            var url = URL.createObjectURL(blob);
+            result.innerHTML = '<div class="result-card p-5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">' +
+              '<div><p class="font-semibold text-emerald-800">✓ PDF signed!</p><p class="text-sm text-emerald-600">Signed by ' + name + ' on ' + dateVal + ' · ' + formatSize(blob.size) + '</p></div>' +
+              '<a href="' + url + '" download="' + self.state.file.name.replace('.pdf', '-signed.pdf') + '" class="bg-emerald-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-all flex items-center gap-2"><i data-lucide="download" style="width:16px;height:16px;"></i> Download</a>' +
+              '</div>';
+            lucide.createIcons();
+          } catch (err) {
+            result.innerHTML = '<div class="p-4 bg-red-50 text-red-700 rounded-xl text-sm">Error: ' + err.message + '</div>';
+          }
+          btn.disabled = false; btn.innerHTML = '<i data-lucide="pen-tool" style="width:18px;height:18px;"></i> Sign PDF'; lucide.createIcons();
+        });
+      },
+      cleanup: function () { this.state.file = null; }
+    };
+
+    // ---- REPAIR PDF ----
+    TOOLS['repair-pdf'] = {
+      name: 'Repair PDF',
+      icon: 'wrench',
+      state: { file: null },
+      render: function () {
+        return '<div class="max-w-3xl mx-auto">' +
+          '<div class="mb-8"><h3 class="text-2xl font-bold mb-2">Repair PDF</h3><p class="text-slate-500">Attempt to repair corrupted or damaged PDF files by rebuilding the internal document structure.</p></div>' +
+          '<div id="repair-dropzone" class="drop-zone p-10 sm:p-14 text-center mb-6">' +
+          '<div class="flex flex-col items-center gap-3"><i data-lucide="upload" style="width:40px;height:40px;" class="text-slate-300"></i>' +
+          '<p class="text-slate-500 font-medium">Drop a PDF here or <span class="text-sky-600 underline">browse</span></p></div>' +
+          '<input type="file" id="repair-input" accept=".pdf,application/pdf" class="hidden" />' +
+          '</div>' +
+          '<div id="repair-file-info" class="mb-6"></div>' +
+          '<button id="repair-btn" class="btn-primary text-white font-semibold px-6 py-3 rounded-xl inline-flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed hidden" disabled><i data-lucide="wrench" style="width:18px;height:18px;"></i> Repair PDF</button>' +
+          '<div id="repair-result" class="mt-6"></div>' +
+          '</div>';
+      },
+      init: function () {
+        var self = this;
+        var dropzone = document.getElementById('repair-dropzone');
+        var input = document.getElementById('repair-input');
+        var info = document.getElementById('repair-file-info');
+        var btn = document.getElementById('repair-btn');
+        var result = document.getElementById('repair-result');
+
+        dropzone.addEventListener('click', function () { input.click(); });
+        input.addEventListener('change', function () { if (this.files[0]) loadFile(this.files[0]); });
+        dropzone.addEventListener('dragover', function (e) { e.preventDefault(); this.classList.add('drag-over'); });
+        dropzone.addEventListener('dragleave', function () { this.classList.remove('drag-over'); });
+        dropzone.addEventListener('drop', function (e) { e.preventDefault(); this.classList.remove('drag-over'); if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+
+        function loadFile(file) {
+          if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) return;
+          self.state.file = file;
+          info.innerHTML = '<div class="flex items-center gap-3 p-4 bg-sky-50 border border-sky-200 rounded-xl"><div class="w-10 h-10 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center"><i data-lucide="file-text" style="width:20px;height:20px;"></i></div><div><p class="text-sm font-medium text-sky-800">' + file.name + '</p><p class="text-xs text-sky-600">' + formatSize(file.size) + '</p></div></div>';
+          btn.classList.remove('hidden');
+          btn.disabled = false;
+          result.innerHTML = '';
+          lucide.createIcons();
+        }
+
+        btn.addEventListener('click', async function () {
+          if (!self.state.file) return;
+          btn.disabled = true; btn.innerHTML = '<span class="spinner inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span> Repairing...';
+          result.innerHTML = '';
+          try {
+            var buf = await self.state.file.arrayBuffer();
+            var originalSize = buf.byteLength;
+            var repaired = false;
+            var pdf;
+
+            // Attempt 1: Standard load
+            try {
+              pdf = await PDFDocument.load(buf, { ignoreEncryption: true });
+              repaired = true;
+            } catch (e1) {
+              // Attempt 2: Try copying pages to fresh document
+              try {
+                var partialPdf = await PDFDocument.load(buf, { ignoreEncryption: true });
+                pdf = await PDFDocument.create();
+                var indices = partialPdf.getPageIndices();
+                var pages = await pdf.copyPages(partialPdf, indices);
+                pages.forEach(function (p) { pdf.addPage(p); });
+                repaired = true;
+              } catch (e2) {
+                throw new Error('Could not repair this PDF. The file may be too severely corrupted. (' + e2.message + ')');
+              }
+            }
+
+            // Strip metadata and re-save with clean structure
+            pdf.setTitle(''); pdf.setAuthor(''); pdf.setSubject('');
+            pdf.setKeywords([]); pdf.setProducer(''); pdf.setCreator('');
+            var bytes = await pdf.save({ useObjectStreams: true });
+            var blob = new Blob([bytes], { type: 'application/pdf' });
+            var url = URL.createObjectURL(blob);
+            var savedSize = bytes.byteLength;
+            var details = 'Rebuilt document structure · Stripped metadata';
+            if (pdf.getPageCount() > 0) details += ' · ' + pdf.getPageCount() + ' pages preserved';
+            result.innerHTML = '<div class="result-card p-5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">' +
+              '<div><p class="font-semibold text-emerald-800">✓ PDF repaired!</p><p class="text-sm text-emerald-600">' + details + ' · ' + formatSize(savedSize) + '</p></div>' +
+              '<a href="' + url + '" download="' + self.state.file.name.replace('.pdf', '-repaired.pdf') + '" class="bg-emerald-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-all flex items-center gap-2"><i data-lucide="download" style="width:16px;height:16px;"></i> Download</a>' +
+              '</div>';
+            lucide.createIcons();
+          } catch (err) {
+            result.innerHTML = '<div class="p-4 bg-red-50 text-red-700 rounded-xl text-sm">Error: ' + err.message + '</div>';
+          }
+          btn.disabled = false; btn.innerHTML = '<i data-lucide="wrench" style="width:18px;height:18px;"></i> Repair PDF'; lucide.createIcons();
+        });
+      },
+      cleanup: function () { this.state.file = null; }
+    };
+
     // ====== APP CONTROLLER ======
     var App = {
       currentTool: null,
@@ -3320,7 +4519,54 @@
           document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
         });
       });
+
+      // Coming Soon modal
+      var comingModal = document.getElementById('coming-modal');
+      var comingBackdrop = document.getElementById('coming-modal-backdrop');
+      var comingMsg = document.getElementById('coming-modal-msg');
+
+      function showComingModal(msg) {
+        comingMsg.textContent = msg;
+        comingModal.classList.add('active');
+        lucide.createIcons();
+      }
+
+      function hideComingModal() {
+        comingModal.classList.remove('active');
+      }
+
+      document.querySelectorAll('[data-coming-soon]').forEach(function (card) {
+        card.addEventListener('click', function (e) {
+          e.stopPropagation();
+          showComingModal(this.dataset.msg);
+        });
+      });
+
+      document.getElementById('coming-modal-close').addEventListener('click', hideComingModal);
+      document.getElementById('coming-modal-cta').addEventListener('click', hideComingModal);
+      comingBackdrop.addEventListener('click', hideComingModal);
     });
   </script>
+
+  <!-- Coming Soon Modal -->
+  <div id="coming-modal" class="coming-modal fixed inset-0 z-[200] items-center justify-center p-4">
+    <div id="coming-modal-backdrop" class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+    <div class="coming-modal-inner relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center">
+      <button id="coming-modal-close" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
+        <i data-lucide="x" style="width:18px;height:18px;"></i>
+      </button>
+      <div class="w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-5">
+        <i data-lucide="sparkles" style="width:28px;height:28px;"></i>
+      </div>
+      <h3 class="text-2xl font-bold text-slate-900 mb-4">Coming Soon</h3>
+      <p id="coming-modal-msg" class="text-slate-600 leading-relaxed mb-6"></p>
+      <p class="text-slate-600 leading-relaxed mb-8">
+        Unlike other platforms that send your sensitive documents to OpenAI or Anthropic, we believe AI document workflows should be 100% private and run entirely on your device.
+      </p>
+      <button id="coming-modal-cta" class="btn-primary text-white text-sm font-semibold px-6 py-3 rounded-xl">
+        Got it
+      </button>
+    </div>
+  </div>
 </body>
 </html>
